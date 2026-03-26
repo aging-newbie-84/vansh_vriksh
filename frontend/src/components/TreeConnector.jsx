@@ -14,36 +14,28 @@ const TreeConnector = ({ link }) => {
   const isMarriage = link.type === 'marriage';
 
   if (isMarriage) {
-    // Double terracotta line for marriage
+    const sx = link.source.x;
+    const sy = link.source.y;
+    const tx = link.target.x;
+    const ty = link.target.y;
+    const mx = (sx + tx) / 2;
+    const my = (sy + ty) / 2;
+
     return (
       <g className="connector-group">
-        <path
-          d={path}
+        {/* Horizontal marriage line */}
+        <line
+          x1={sx} y1={sy} x2={tx} y2={ty}
           stroke="#C4622D"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
+          strokeWidth="2"
+          strokeDasharray="6,4"
+          opacity="0.6"
         />
-        <path
-          d={path}
-          stroke="#C4622D"
-          strokeWidth="0.8"
-          fill="none"
-          strokeLinecap="round"
-          opacity="0.45"
-          strokeDasharray="0"
-        />
-        {/* Centre marriage roundel — midpoint approximation */}
-        <circle
-          cx={(link.source.x + link.target.x) / 2}
-          cy={(link.source.y + link.target.y) / 2 - 10}
-          r="4"
-          fill="#C4622D"
-          stroke="#EDE0CE"
-          strokeWidth="1.5"
-        />
+        {/* Centre marriage roundel */}
+        <circle cx={mx} cy={my} r="5" fill="#C4622D" stroke="#EDE0CE" strokeWidth="2" />
+        <text x={mx} y={my + 1} textAnchor="middle" dominantBaseline="middle" fontSize="6" fill="#EDE0CE">∞</text>
         {/* Hit area */}
-        <path d={path} stroke="transparent" strokeWidth="12" fill="none" className="cursor-pointer" />
+        <line x1={sx} y1={sy} x2={tx} y2={ty} stroke="transparent" strokeWidth="12" className="cursor-pointer" />
       </g>
     );
   }

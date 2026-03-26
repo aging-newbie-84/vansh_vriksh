@@ -59,12 +59,29 @@ const PersonCard = ({ person, onUpdate, onVerify, onRemove }) => {
           </div>
           <div className="flex flex-col">
             <label className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] p-1">Location</label>
-            <input 
+            <input
               className="px-3 py-2 bg-gray-50 border-transparent border-2 focus:border-[var(--color-accent)] focus:bg-white rounded-lg text-sm transition-all"
               value={person.location || ''}
               onChange={(e) => onUpdate(person.id, 'location', e.target.value)}
               placeholder="Odisha, Bangalore..."
             />
+          </div>
+          <div className="flex flex-col col-span-2">
+            <label className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] p-1">Status</label>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => onUpdate(person.id, 'is_deceased', false)}
+                className={`flex-1 py-1 rounded-md text-xs font-bold transition-all ${!person.is_deceased ? 'bg-white shadow-sm font-black text-green-700' : 'text-gray-400'}`}
+              >
+                ALIVE
+              </button>
+              <button
+                onClick={() => onUpdate(person.id, 'is_deceased', true)}
+                className={`flex-1 py-1 rounded-md text-xs font-bold transition-all ${person.is_deceased ? 'bg-white shadow-sm font-black text-gray-600' : 'text-gray-400'}`}
+              >
+                DECEASED †
+              </button>
+            </div>
           </div>
         </div>
 

@@ -14,6 +14,7 @@ const TreeNode = ({ node }) => {
   const innerRing  = isMale ? '#6B7C4F' : '#C4622D';
   const dotColor   = outerRing;
   const initial    = (data.name || 'U').trim().charAt(0).toUpperCase();
+  const isDeceased = data.is_deceased === true;
   const initColor  = isMale ? '#C4622D' : '#6B7C4F';
   const yearColor  = isMale ? '#C4622D' : '#6B7C4F';
   const borderTop  = isMale ? '#C4622D' : '#6B7C4F';
@@ -36,6 +37,7 @@ const TreeNode = ({ node }) => {
         top: y,
         transform: 'translate(-50%, -50%)',
         width: 150,
+        opacity: isDeceased ? 0.65 : 1,
       }}
     >
       {/* ── Medallion ring ── */}
@@ -129,6 +131,20 @@ const TreeNode = ({ node }) => {
         >
           {data.name || 'UNNAMED'}
         </div>
+
+        {isDeceased && (
+          <div
+            style={{
+              fontFamily: "'Lora', serif",
+              fontSize: '0.55rem',
+              color: '#9E9485',
+              letterSpacing: '0.08em',
+              marginTop: 1,
+            }}
+          >
+            † deceased
+          </div>
+        )}
 
         {/* Years */}
         {years && (

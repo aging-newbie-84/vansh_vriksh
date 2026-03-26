@@ -54,14 +54,14 @@ const MOHANTY_MOCK = {
     {
       id: 'p1', name: 'Biranchi Narayan Mohanty', gender: 'male',
       role: 'Patriarch', one_liner: 'Bhubaneswar · Elder · The root of the Mohanty tree',
-      verified: true,
+      verified: true, is_deceased: true,
       marriages: [
         { spouse_id: 'p2', children_ids: ['p4', 'p5', 'p6', 'p7'] },
         { spouse_id: 'p3', children_ids: ['p8'] }
       ]
     },
-    { id: 'p2', name: 'First Wife', gender: 'female', role: 'Matriarch (First Marriage)', verified: true, marriages: [] },
-    { id: 'p3', name: 'Second Wife', gender: 'female', role: 'Matriarch (Second Marriage)', verified: true, marriages: [] },
+    { id: 'p2', name: 'First Wife', gender: 'female', role: 'Matriarch (First Marriage)', verified: true, is_deceased: true, marriages: [] },
+    { id: 'p3', name: 'Second Wife', gender: 'female', role: 'Matriarch (Second Marriage)', verified: true, is_deceased: true, marriages: [] },
 
     // Sons — first marriage
     {

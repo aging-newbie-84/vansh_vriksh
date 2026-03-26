@@ -125,6 +125,7 @@ function PrintNodeHTML({ node, px, py }) {
   const deathYear = d.death_year || d.deathYear || '';
   const years = birthYear ? `${birthYear} – ${deathYear || 'present'}` : '';
   const bio = (d.profession || d.one_liner || '').substring(0, 26);
+  const isDeceased = d.is_deceased === true;
 
   return (
     <div
@@ -135,6 +136,7 @@ function PrintNodeHTML({ node, px, py }) {
         width: NODE_W,
         height: NODE_H,
         background: PARCHMENT,
+        opacity: isDeceased ? 0.6 : 1,
         border: `0.75px solid ${GOLD_BORD}`,
         borderTop: `2px solid ${topAccent}`,
         boxSizing: 'border-box',
@@ -195,6 +197,11 @@ function PrintNodeHTML({ node, px, py }) {
           }}
         >
           {years}
+        </div>
+      )}
+      {isDeceased && (
+        <div style={{ fontFamily: "'Lora', serif", fontSize: 5.5, color: '#9E9485', opacity: 0.7 }}>
+          † deceased
         </div>
       )}
       {/* Profession one-liner */}

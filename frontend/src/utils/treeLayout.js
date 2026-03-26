@@ -62,7 +62,7 @@ export function buildTreeLayout(people, rootPersonId) {
   // Setup D3 layout
   // D3 nodeSize gives fixed spacing per node (x, y coordinates).
   const treeLayout = d3.tree()
-    .nodeSize([160, 220]);
+    .nodeSize([270, 220]);
     
   const rootHierarchy = d3.hierarchy(nestedData);
 
@@ -73,7 +73,37 @@ export function buildTreeLayout(people, rootPersonId) {
   const nodes = rootHierarchy.descendants();
   const links = rootHierarchy.links();
 
-  return { nodes, links };
+  // ── Position spouses beside their partners ──────────────────────
+  const spouseNodes = [];
+  const marriageLinks = [];
+
+  nodes.forEach(node => {
+    if (!node.data.marriages) return;
+    node.data.marriages.forEach(marriage => {
+      if (!marriage.spouse_id) return;
+      const spousePerson = people.find(p => p.id === marriage.spouse_id);
+      if (!spousePerson) return;
+      // Skip if spouse is already in the hierarchy (someone's child too)
+      if (nodes.some(n => n.data.id === spousePerson.id)) return;
+      if (spouseNodes.some(n => n.data.id === spousePerson.id)) return;
+
+      const spouseNode = {
+        x: node.x + 100,
+        y: node.y,
+        depth: node.depth,
+        data: { ...spousePerson },
+        isSpouse: true,
+      };
+      spouseNodes.push(spouseNode);
+      marriageLinks.push({
+        source: { x: node.x, y: node.y, data: node.data },
+        target: { x: spouseNode.x, y: spouseNode.y, data: spouseNode.data },
+        type: 'marriage',
+      });
+    });
+  });
+
+  return { nodes: [...nodes, ...spouseNodes], links: [...links, ...marriageLinks] };
 }
 
 /**
