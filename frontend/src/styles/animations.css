@@ -1,0 +1,78 @@
+/* Animations and Transitions for Vansh Vriksha */
+
+/* Screen transitions */
+.screen-enter {
+  animation: screenEnter 400ms ease forwards;
+}
+
+@keyframes screenEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Microphone recording pulse */
+@keyframes mic-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(212, 175, 55, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+.mic-pulsing {
+  animation: mic-pulse 1.5s infinite;
+}
+
+/* Tree node appearance */
+@keyframes node-reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.node-reveal-anim {
+  animation: node-reveal 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0; /* starts hidden */
+}
+
+/* Gold shimmer on connector lines */
+@keyframes line-draw {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.line-draw-anim {
+  stroke-dasharray: 1000;
+  animation: line-draw 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Smooth Spinner */
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-gold {
+  animation: spin 3s linear infinite;
+  color: var(--color-accent);
+}
