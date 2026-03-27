@@ -53,7 +53,8 @@ const MOHANTY_MOCK = {
   persons: [
     {
       id: 'p1', name: 'Biranchi Narayan Mohanty', gender: 'male',
-      role: 'Patriarch', one_liner: 'Bhubaneswar · Elder · The root of the Mohanty tree',
+      location: 'Kianalikul, Jajpur Town, Odisha',
+      role: 'Patriarch', one_liner: 'Kianalikul, Jajpur · Elder · The root of the Mohanty tree',
       verified: true, is_deceased: true,
       marriages: [
         { spouse_id: 'p2', children_ids: ['p4', 'p5', 'p6', 'p7'] },

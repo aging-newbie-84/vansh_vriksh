@@ -97,6 +97,25 @@ const PreviewScreen = ({ data, onConfirm, onAddMore, sessionId }) => {
           </div>
         )}
       </main>
+
+      {/* Sticky floating Build button — always reachable on scroll */}
+      {allVerified && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={handleConfirm}
+            className="px-8 py-3 rounded-full font-display uppercase tracking-widest bg-[var(--color-primary)] text-white shadow-2xl hover:bg-[var(--color-accent)] hover:shadow-[var(--shadow-glow)] transition-all text-sm"
+          >
+            Build My Tree ✨
+          </button>
+        </div>
+      )}
+      {!allVerified && localData.persons.length > 0 && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="px-5 py-2.5 rounded-full bg-white border-2 border-amber-300 text-amber-700 text-xs font-bold shadow-lg">
+            {localData.persons.filter(p => !p.verified).length} remaining to confirm
+          </div>
+        </div>
+      )}
     </div>
   );
 };
