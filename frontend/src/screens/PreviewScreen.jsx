@@ -65,7 +65,7 @@ const PreviewScreen = ({ data, onConfirm, onAddMore, onDataChange, sessionId }) 
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto w-full p-6 space-y-8">
+      <main className="max-w-7xl mx-auto w-full p-4 space-y-6">
         {localData.ambiguities?.length > 0 && (
           <AmbiguityBanner ambiguities={localData.ambiguities} onResolve={() => {}} />
         )}
@@ -74,8 +74,8 @@ const PreviewScreen = ({ data, onConfirm, onAddMore, onDataChange, sessionId }) 
           "{localData.summary}"
         </div>
 
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {localData.persons.map(person => (
               <PersonCard 
                 key={person.id}
