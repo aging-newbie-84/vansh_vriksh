@@ -256,19 +256,7 @@ const TreeScreen = ({ data, onBack }) => {
         </div>
       </div>
 
-      {/* Footer hint */}
-      <footer className="fixed bottom-5 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-        <div style={{
-          background: 'rgba(253,240,220,0.88)', backdropFilter: 'blur(8px)',
-          border: '1px solid #C4622D', borderRadius: 20, padding: '5px 20px',
-          fontFamily: "'Cormorant Garamond', serif", fontSize: '0.52rem',
-          letterSpacing: '0.28em', textTransform: 'uppercase', color: '#9E9485',
-        }}>
-          Drag to Pan · Scroll to Zoom
-        </div>
-      </footer>
-
-      {/* Off-screen print canvas */}
+{/* Off-screen print canvas */}
       <PrintCanvas ref={printRef} data={data} layout={layout} familyName={familyName} format={pdfFormat} />
     </div>
   );
