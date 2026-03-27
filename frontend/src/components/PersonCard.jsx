@@ -16,7 +16,8 @@ const PersonCard = ({ person, onUpdate, onVerify, onRemove }) => {
   const isMale      = !person.gender || person.gender === 'male';
   const isVerified  = person.verified;
   const isDeceased  = person.is_deceased === true;
-  const isSingle    = !isMale && (!person.marriages || person.marriages.length === 0);
+  // Only mark single if explicitly set — can't infer from missing marriages[] (spouses don't have it)
+  const isSingle    = !isMale && person.is_single === true;
 
   const accent = getAccent(person.gender, isSingle);
 
@@ -158,12 +159,17 @@ const PersonCard = ({ person, onUpdate, onVerify, onRemove }) => {
             >† Gone</button>
           </div>
 
-          {/* Single female badge */}
-          {isSingle && (
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-semibold"
-              style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}30` }}>
-              ✦ unmarried
-            </span>
+          {/* Single toggle — only for females, user-controlled */}
+          {!isMale && (
+            <button
+              onClick={() => onUpdate(person.id, 'is_single', !person.is_single)}
+              className="px-2 py-0.5 rounded-full text-[9px] font-semibold transition-all"
+              style={isSingle
+                ? { background: `${accent}18`, color: accent, border: `1px solid ${accent}40` }
+                : { background: 'transparent', color: '#ccc', border: '1px solid #eee' }}
+            >
+              {isSingle ? '✦ unmarried' : '✦ single?'}
+            </button>
           )}
         </div>
 
