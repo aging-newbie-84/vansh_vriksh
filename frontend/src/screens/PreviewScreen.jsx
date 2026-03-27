@@ -2,24 +2,30 @@ import React, { useState } from 'react';
 import PersonCard from '../components/PersonCard';
 import AmbiguityBanner from '../components/AmbiguityBanner';
 
-const PreviewScreen = ({ data, onConfirm, onAddMore, sessionId }) => {
+const PreviewScreen = ({ data, onConfirm, onAddMore, onDataChange, sessionId }) => {
   const [localData, setLocalData] = useState(data);
 
   if (!localData) return null;
 
+  // Sync every edit back to App.jsx so returning from tree screen preserves changes
+  const update = (next) => {
+    setLocalData(next);
+    onDataChange?.(next);
+  };
+
   const handleUpdatePerson = (id, field, value) => {
     const updated = localData.persons.map(p => p.id === id ? { ...p, [field]: value } : p);
-    setLocalData({ ...localData, persons: updated });
+    update({ ...localData, persons: updated });
   };
 
   const handleVerifyPerson = (id) => {
     const updated = localData.persons.map(p => p.id === id ? { ...p, verified: !p.verified } : p);
-    setLocalData({ ...localData, persons: updated });
+    update({ ...localData, persons: updated });
   };
 
   const handleRemovePerson = (id) => {
     const updated = localData.persons.filter(p => p.id !== id);
-    setLocalData({ ...localData, persons: updated });
+    update({ ...localData, persons: updated });
   };
 
   const handleConfirm = () => {

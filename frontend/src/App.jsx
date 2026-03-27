@@ -25,11 +25,11 @@ function App() {
     }
   }, []);
 
+  // Save immediately on every change — not on a 30s interval
   useEffect(() => {
-    const interval = setInterval(() => {
+    if (parsedData || confirmedData) {
       localStorage.setItem('vv_draft', JSON.stringify({ parsedData, confirmedData }));
-    }, 30000);
-    return () => clearInterval(interval);
+    }
   }, [parsedData, confirmedData]);
 
   const handleParseComplete = (data) => {
@@ -67,10 +67,11 @@ function App() {
             />
           )}
           {screen === 'preview' && (
-            <PreviewScreen 
+            <PreviewScreen
               data={parsedData}
               onConfirm={handleConfirmTree}
               onAddMore={handleBackToInput}
+              onDataChange={setParsedData}
               sessionId={sessionId}
             />
           )}
