@@ -1,65 +1,78 @@
 import React from 'react';
-import { generateCurvedPath } from '../utils/treeLayout';
+import { NODE_H, SPOUSE_H } from './TreeNode';
 
 /**
- * TreeConnector — Odishan Dynasty redesign.
- * Parent-child: single Oriya green curve with arrowhead.
- * Marriage: double terracotta curve with centre roundel.
+ * TreeConnector — clean orthogonal elbow connectors.
+ *
+ * Parent → child:  vertical drop + horizontal bar + vertical rise.
+ *   No bezier curves. Lines never cross.
+ *
+ * Marriage:  short solid horizontal line with ∞ roundel.
+ *   Connects from right-edge of primary to left-edge of spouse card.
  */
+const HALF_H       = NODE_H / 2;      // 40px — exit/entry offset from node center
+const HALF_SPOUSE  = SPOUSE_H / 2;    // 32px
+
 const TreeConnector = ({ link }) => {
-  const path = generateCurvedPath(
-    link.source.x, link.source.y,
-    link.target.x, link.target.y
-  );
   const isMarriage = link.type === 'marriage';
 
   if (isMarriage) {
-    const sx = link.source.x;
-    const sy = link.source.y;
-    const tx = link.target.x;
-    const ty = link.target.y;
+    const sx = link.source.x + 82;    // right edge of primary card (NODE_W/2)
+    const tx = link.target.x - 62;    // left edge of spouse card  (SPOUSE_W/2)
+    const y  = link.source.y;         // same generation row
+
+    if (tx <= sx) return null;         // safety guard — don't draw backwards
     const mx = (sx + tx) / 2;
-    const my = (sy + ty) / 2;
 
     return (
-      <g className="connector-group">
-        {/* Horizontal marriage line */}
+      <g>
         <line
-          x1={sx} y1={sy} x2={tx} y2={ty}
+          x1={sx} y1={y} x2={tx} y2={y}
           stroke="#C4622D"
           strokeWidth="2"
-          strokeDasharray="6,4"
-          opacity="0.6"
+          strokeDasharray="5,3"
+          opacity="0.7"
         />
-        {/* Centre marriage roundel */}
-        <circle cx={mx} cy={my} r="5" fill="#C4622D" stroke="#EDE0CE" strokeWidth="2" />
-        <text x={mx} y={my + 1} textAnchor="middle" dominantBaseline="middle" fontSize="6" fill="#EDE0CE">∞</text>
-        {/* Hit area */}
-        <line x1={sx} y1={sy} x2={tx} y2={ty} stroke="transparent" strokeWidth="12" className="cursor-pointer" />
+        <circle cx={mx} cy={y} r="6" fill="#C4622D" />
+        <text
+          x={mx} y={y}
+          textAnchor="middle" dominantBaseline="middle"
+          fontSize="7" fill="#FDF0DC" fontFamily="'Cormorant Garamond', serif"
+        >
+          ∞
+        </text>
       </g>
     );
   }
 
-  // Parent-child: single oriya green curve with terminal arrowhead
-  const tx = link.target.x;
-  const ty = link.target.y;
+  // ── Parent → child orthogonal elbow ───────────────────────────────────────
+  const sx   = link.source.x;
+  const sy   = link.source.y + HALF_H;   // bottom-center of parent card
+  const tx   = link.target.x;
+  const ty   = link.target.y - HALF_H;   // top-center of child card
+
+  // Mid-Y: halfway between parent bottom and child top
+  const midY = sy + (ty - sy) * 0.5;
+
+  // Orthogonal path: down → across → down
+  const d = `M ${sx},${sy} L ${sx},${midY} L ${tx},${midY} L ${tx},${ty}`;
 
   return (
-    <g className="connector-group">
+    <g>
       <path
-        d={path}
-        stroke="#6B7C4F"
-        strokeWidth="1.8"
+        d={d}
+        stroke="#5A7A4E"
+        strokeWidth="1.5"
         fill="none"
-        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.75"
       />
-      {/* Arrowhead at child end */}
+      {/* Small arrowhead at child entry */}
       <polygon
-        points={`${tx},${ty - 2} ${tx - 5},${ty - 12} ${tx + 5},${ty - 12}`}
-        fill="#6B7C4F"
+        points={`${tx},${ty} ${tx - 4},${ty - 9} ${tx + 4},${ty - 9}`}
+        fill="#5A7A4E"
+        opacity="0.75"
       />
-      {/* Hit area */}
-      <path d={path} stroke="transparent" strokeWidth="12" fill="none" className="cursor-pointer" />
     </g>
   );
 };
