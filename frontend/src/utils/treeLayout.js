@@ -62,7 +62,7 @@ export function buildTreeLayout(people, rootPersonId) {
   // Setup D3 layout
   // D3 nodeSize gives fixed spacing per node (x, y coordinates).
   const treeLayout = d3.tree()
-    .nodeSize([310, 200]);   // 310px horizontal — room for spouse card beside primary
+    .nodeSize([220, 140]);   // tighter — auto-fit zoom will handle scale
     
   const rootHierarchy = d3.hierarchy(nestedData);
 
@@ -88,7 +88,7 @@ export function buildTreeLayout(people, rootPersonId) {
       if (spouseNodes.some(n => n.data.id === spousePerson.id)) return;
 
       const spouseNode = {
-        x: node.x + 160,   // 82 (half card) + 16 gap + 62 (half spouse card)
+        x: node.x + 130,   // tighter spouse offset matching reduced nodeSize
         y: node.y,
         depth: node.depth,
         data: { ...spousePerson },

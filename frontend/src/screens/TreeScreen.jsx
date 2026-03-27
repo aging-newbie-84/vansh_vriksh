@@ -21,20 +21,34 @@ const TreeScreen = ({ data, onBack }) => {
   const [saving, setSaving]   = useState(false);
   const [shareCode, setShareCode] = useState(null);
 
-  // Build layout and centre view
+  // Build layout + auto-fit zoom so the full tree is visible on load
   useEffect(() => {
     if (!data) return;
     const tree = buildTreeLayout(data.persons, data.persons[0]?.id);
     setLayout(tree);
 
-    // Auto-centre: find bounding box and translate to viewport centre
     if (tree.nodes.length > 0) {
-      const xs = tree.nodes.map(n => n.x);
-      const ys = tree.nodes.map(n => n.y);
-      const midX = (Math.min(...xs) + Math.max(...xs)) / 2;
-      const midY = (Math.min(...ys) + Math.max(...ys)) / 2;
-      // We'll offset so mid of tree maps to canvas centre
-      setPan({ x: -midX * 0.85, y: -midY * 0.85 + 80 });
+      const xs  = tree.nodes.map(n => n.x);
+      const ys  = tree.nodes.map(n => n.y);
+      const minX = Math.min(...xs) - 120;
+      const maxX = Math.max(...xs) + 120;
+      const minY = Math.min(...ys) - 80;
+      const maxY = Math.max(...ys) + 80;
+
+      const treeW = maxX - minX;
+      const treeH = maxY - minY;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - 72;  // minus header height
+
+      // Scale to fit, capped at 1.0 so we never over-zoom a small tree
+      const fitZoom = Math.min(vw / treeW, vh / treeH, 1.0);
+      setZoom(fitZoom);
+
+      // Centre the tree in the viewport at the fitted zoom
+      const midX = (minX + maxX) / 2;
+      const midY = (minY + maxY) / 2;
+      setPan({ x: -midX * fitZoom, y: -midY * fitZoom });
     }
   }, [data]);
 
@@ -109,86 +123,104 @@ const TreeScreen = ({ data, onBack }) => {
     <div className="flex flex-col h-screen overflow-hidden select-none"
       style={{ background: '#F5ECD8', fontFamily: 'var(--font-body)' }}
     >
-      {/* ══════════ HEADER ══════════ */}
-      <header className="fixed top-0 z-20 w-full flex items-center justify-between px-6 py-3"
+      {/* ══════════ DYNASTY HEADER ══════════ */}
+      <header className="fixed top-0 z-20 w-full"
         style={{
-          background: 'rgba(253,240,220,0.95)',
-          backdropFilter: 'blur(10px)',
-          borderBottom: '2px solid #C4622D',
-          boxShadow: '0 2px 20px rgba(42,31,20,0.12)',
+          background: 'linear-gradient(135deg, #1E0F06 0%, #2E1608 60%, #1E0F06 100%)',
+          borderBottom: '3px solid #C4622D',
+          boxShadow: '0 4px 32px rgba(0,0,0,0.45)',
+          height: 72,
         }}
       >
-        <button onClick={onBack} style={{
-          fontFamily: "'Cormorant Garamond', serif", fontSize: '0.65rem',
-          letterSpacing: '0.25em', textTransform: 'uppercase',
-          color: '#C4622D', border: '1px solid #C4622D',
-          background: 'transparent', borderRadius: 4, padding: '6px 14px', cursor: 'pointer',
-        }}>
-          ← Back
-        </button>
+        {/* Thin gold line across top */}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:'linear-gradient(90deg, transparent, #C4622D88, #E8B86D, #C4622D88, transparent)' }} />
 
-        <div className="flex items-center gap-4">
-          <CoatOfArms persons={data?.persons || []} familyName={familyName} size={52} />
-          <div className="text-center hidden sm:block">
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.05rem', color: '#C4622D', fontStyle: 'italic' }}>
-              {familyName}
-            </div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.52rem', color: '#5A7A4E', letterSpacing: '0.35em', textTransform: 'uppercase', marginTop: 1 }}>
-              वंश वृक्ष · Dynasty Lineage
+        <div className="flex items-center h-full px-4 gap-3">
+          {/* Back */}
+          <button onClick={onBack} style={{
+            fontFamily: "'Cormorant Garamond', serif", fontSize: '0.6rem',
+            letterSpacing: '0.2em', textTransform: 'uppercase',
+            color: '#E8B86D', border: '1px solid #C4622D55',
+            background: 'transparent', borderRadius: 3, padding: '5px 12px', cursor: 'pointer',
+            flexShrink: 0,
+          }}>← Back</button>
+
+          {/* Dynasty proclamation — centred */}
+          <div className="flex-1 flex items-center justify-center gap-3">
+            <CoatOfArms persons={data?.persons || []} familyName={familyName} size={44} />
+            <div className="text-center">
+              {/* The name — large, proud */}
+              <div style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontWeight: 800,
+                fontSize: '1.5rem',
+                color: '#F5E6C8',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                lineHeight: 1,
+                textShadow: '0 1px 12px rgba(196,98,45,0.4)',
+              }}>
+                {familyName.replace(' Family', '')}
+              </div>
+              {/* Dynasty tagline */}
+              <div style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: '0.52rem',
+                color: '#C4622D',
+                letterSpacing: '0.45em',
+                textTransform: 'uppercase',
+                marginTop: 3,
+              }}>
+                ── वंश वृक्ष · Dynasty Lineage ──
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
-          {/* Zoom controls */}
-          <div className="flex items-center rounded overflow-hidden" style={{ border: '1px solid #C4622D' }}>
-            <button onClick={() => setZoom(z => Math.max(0.2, z - 0.1))}
-              style={{ width: 28, height: 28, background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: '#C4622D' }}>−</button>
-            <div style={{ width: 44, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'Cormorant Garamond', serif", fontSize: '0.6rem', borderLeft: '1px solid #D4C5B0', borderRight: '1px solid #D4C5B0', color: '#2A1F14' }}>
-              {Math.round(zoom * 100)}%
+          {/* Controls — right side, compact */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center rounded overflow-hidden" style={{ border: '1px solid #C4622D55' }}>
+              <button onClick={() => setZoom(z => Math.max(0.1, z - 0.1))}
+                style={{ width:24, height:26, background:'transparent', border:'none', cursor:'pointer', fontWeight:'bold', color:'#E8B86D', fontSize:'0.9rem' }}>−</button>
+              <div style={{ width:38, height:26, display:'flex', alignItems:'center', justifyContent:'center',
+                fontFamily:"'Cormorant Garamond', serif", fontSize:'0.58rem', color:'#E8B86D',
+                borderLeft:'1px solid #C4622D44', borderRight:'1px solid #C4622D44' }}>
+                {Math.round(zoom * 100)}%
+              </div>
+              <button onClick={() => setZoom(z => Math.min(3, z + 0.1))}
+                style={{ width:24, height:26, background:'transparent', border:'none', cursor:'pointer', fontWeight:'bold', color:'#E8B86D', fontSize:'0.9rem' }}>+</button>
             </div>
-            <button onClick={() => setZoom(z => Math.min(3, z + 0.1))}
-              style={{ width: 28, height: 28, background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold', color: '#C4622D' }}>+</button>
-          </div>
 
-          <select value={pdfFormat} onChange={e => setPdfFormat(e.target.value)}
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.6rem', letterSpacing: '0.1em', color: '#2A1F14',
-              background: '#FDF0DC', border: '1px solid #C4622D', borderRadius: 4, padding: '5px 8px', cursor: 'pointer' }}>
-            <option value="a0">A0 Poster</option>
-            <option value="a1">A1 Poster</option>
-            <option value="a2">A2 Print</option>
-            <option value="a3">A3 Print</option>
-          </select>
+            <select value={pdfFormat} onChange={e => setPdfFormat(e.target.value)}
+              style={{ fontFamily:"'Cormorant Garamond', serif", fontSize:'0.55rem', letterSpacing:'0.08em',
+                color:'#E8B86D', background:'transparent', border:'1px solid #C4622D55',
+                borderRadius:3, padding:'4px 6px', cursor:'pointer' }}>
+              <option value="a1" style={{background:'#1E0F06'}}>A1 Poster</option>
+              <option value="a2" style={{background:'#1E0F06'}}>A2 Print</option>
+              <option value="a3" style={{background:'#1E0F06'}}>A3 Print</option>
+            </select>
 
-          <button onClick={handleExport} disabled={exporting} style={{
-            fontFamily: "'Cormorant Garamond', serif", fontSize: '0.62rem', letterSpacing: '0.18em',
-            textTransform: 'uppercase', color: '#FDF0DC',
-            background: exporting ? '#9E9485' : '#C4622D', border: 'none',
-            borderRadius: 20, padding: '7px 18px', cursor: exporting ? 'not-allowed' : 'pointer',
-            boxShadow: '0 2px 10px rgba(196,98,45,0.3)', transition: 'all 0.2s',
-          }}>
-            {exporting ? 'Generating…' : `Export ${pdfFormat.toUpperCase()} PDF`}
-          </button>
-
-          <button onClick={handleSave} disabled={saving || !!shareCode} style={{
-            fontFamily: "'Cormorant Garamond', serif", fontSize: '0.62rem', letterSpacing: '0.18em',
-            textTransform: 'uppercase', color: shareCode ? '#FDF0DC' : '#C4622D',
-            background: shareCode ? '#5A7A4E' : 'transparent',
-            border: shareCode ? 'none' : '1px solid #C4622D',
-            borderRadius: 20, padding: '7px 14px', cursor: saving ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
-          }}>
-            {saving ? 'Saving…' : shareCode ? '✓ Saved' : 'Save & Share'}
-          </button>
-
-          {shareCode && (
-            <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/share/${shareCode}`); alert('Link copied!'); }}
-              style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '0.55rem', letterSpacing: '0.1em',
-                color: '#5A7A4E', background: 'transparent', border: '1px solid #5A7A4E',
-                borderRadius: 20, padding: '6px 12px', cursor: 'pointer' }}>
-              Copy Link
+            <button onClick={handleExport} disabled={exporting} style={{
+              fontFamily:"'Cormorant Garamond', serif", fontSize:'0.6rem', letterSpacing:'0.15em',
+              textTransform:'uppercase', color:'#1E0F06',
+              background: exporting ? '#9E9485' : 'linear-gradient(135deg, #E8B86D, #C4622D)',
+              border:'none', borderRadius:4, padding:'6px 14px',
+              cursor: exporting ? 'not-allowed' : 'pointer',
+              boxShadow:'0 2px 12px rgba(196,98,45,0.4)', transition:'all 0.2s', fontWeight:700,
+            }}>
+              {exporting ? '…' : `Export PDF`}
             </button>
-          )}
+
+            <button onClick={handleSave} disabled={saving || !!shareCode} style={{
+              fontFamily:"'Cormorant Garamond', serif", fontSize:'0.6rem', letterSpacing:'0.12em',
+              textTransform:'uppercase',
+              color: shareCode ? '#1E0F06' : '#E8B86D',
+              background: shareCode ? '#5A7A4E' : 'transparent',
+              border: shareCode ? 'none' : '1px solid #C4622D66',
+              borderRadius:4, padding:'6px 12px', cursor:'pointer', transition:'all 0.2s',
+            }}>
+              {saving ? '…' : shareCode ? '✓ Saved' : 'Share'}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -196,7 +228,7 @@ const TreeScreen = ({ data, onBack }) => {
       <div
         ref={canvasRef}
         className="flex-grow overflow-hidden"
-        style={{ marginTop: 64, cursor: 'grab', position: 'relative' }}
+        style={{ marginTop: 72, cursor: 'grab', position: 'relative' }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
