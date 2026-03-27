@@ -1,24 +1,15 @@
 import React from 'react';
-import { NODE_H, SPOUSE_H } from './TreeNode';
+import { NODE_H, NODE_W, SPOUSE_H, SPOUSE_W } from './TreeNode';
 
-/**
- * TreeConnector — clean orthogonal elbow connectors.
- *
- * Parent → child:  vertical drop + horizontal bar + vertical rise.
- *   No bezier curves. Lines never cross.
- *
- * Marriage:  short solid horizontal line with ∞ roundel.
- *   Connects from right-edge of primary to left-edge of spouse card.
- */
-const HALF_H       = NODE_H / 2;      // 40px — exit/entry offset from node center
-const HALF_SPOUSE  = SPOUSE_H / 2;    // 32px
+const HALF_H      = NODE_H / 2;   // 29px
+const HALF_SPOUSE = SPOUSE_H / 2; // 23px
 
 const TreeConnector = ({ link }) => {
   const isMarriage = link.type === 'marriage';
 
   if (isMarriage) {
-    const sx = link.source.x + 82;    // right edge of primary card (NODE_W/2)
-    const tx = link.target.x - 62;    // left edge of spouse card  (SPOUSE_W/2)
+    const sx = link.source.x + NODE_W / 2;    // right edge of primary card
+    const tx = link.target.x - SPOUSE_W / 2;  // left edge of spouse card
     const y  = link.source.y;         // same generation row
 
     if (tx <= sx) return null;         // safety guard — don't draw backwards

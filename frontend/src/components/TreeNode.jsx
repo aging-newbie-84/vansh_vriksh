@@ -2,10 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 // Card dimensions — referenced by TreeConnector for connection points
-export const NODE_W  = 164;
-export const NODE_H  = 80;
-export const SPOUSE_W = 124;
-export const SPOUSE_H = 64;
+export const NODE_W  = 126;
+export const NODE_H  = 58;
+export const SPOUSE_W = 96;
+export const SPOUSE_H = 46;
 
 const TreeNode = ({ node }) => {
   const { data, x, y, isSpouse } = node;
@@ -48,22 +48,22 @@ const TreeNode = ({ node }) => {
           style={{ width: 5, background: accent, opacity: isDeceased ? 0.5 : 1 }}
         />
 
-        {/* Initial badge */}
+        {/* Initial badge — compact */}
         <div
-          className="absolute flex items-center justify-center rounded-full shadow-inner"
+          className="absolute flex items-center justify-center rounded-full"
           style={{
-            left: 14,
-            top: h / 2 - (isSpouse ? 18 : 22),
-            width: isSpouse ? 36 : 44,
-            height: isSpouse ? 36 : 44,
-            background: `${accent}22`,
-            border: `2px solid ${accent}55`,
+            left: 9,
+            top: h / 2 - (isSpouse ? 14 : 16),
+            width: isSpouse ? 28 : 32,
+            height: isSpouse ? 28 : 32,
+            background: `${accent}20`,
+            border: `1.5px solid ${accent}50`,
           }}
         >
           <span style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 700,
-            fontSize: isSpouse ? '1.15rem' : '1.45rem',
+            fontSize: isSpouse ? '0.85rem' : '1.05rem',
             color: accent,
             lineHeight: 1,
             opacity: isDeceased ? 0.7 : 1,
@@ -76,8 +76,8 @@ const TreeNode = ({ node }) => {
         <div
           className="absolute flex flex-col justify-center"
           style={{
-            left: isSpouse ? 58 : 68,
-            right: 8,
+            left: isSpouse ? 44 : 50,
+            right: 6,
             top: 0,
             bottom: 0,
           }}
@@ -86,9 +86,9 @@ const TreeNode = ({ node }) => {
           <div style={{
             fontFamily: "'Cormorant Garamond', serif",
             fontWeight: 700,
-            fontSize: isSpouse ? '0.72rem' : '0.85rem',
+            fontSize: isSpouse ? '0.62rem' : '0.72rem',
             color: textColor,
-            lineHeight: 1.25,
+            lineHeight: 1.2,
             textDecoration: isDeceased ? 'line-through' : 'none',
             textDecorationColor: '#9E9485',
           }}>
@@ -100,10 +100,13 @@ const TreeNode = ({ node }) => {
             <div style={{
               fontFamily: "'Lora', serif",
               fontStyle: 'italic',
-              fontSize: '0.58rem',
+              fontSize: '0.48rem',
               color: isDeceased ? '#9E9485' : '#6B7C4F',
-              lineHeight: 1.3,
-              marginTop: 2,
+              lineHeight: 1.2,
+              marginTop: 1,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
             }}>
               {data.one_liner || data.role}
             </div>
@@ -113,24 +116,25 @@ const TreeNode = ({ node }) => {
           {isDeceased && (
             <div style={{
               fontFamily: "'Lora', serif",
-              fontSize: '0.52rem',
+              fontSize: '0.42rem',
               color: '#9E9485',
-              letterSpacing: '0.05em',
               marginTop: 1,
             }}>
-              † {data.death_year || 'Deceased'}
+              † Deceased
             </div>
           )}
 
-          {/* Location — only on primary nodes */}
-          {data.location && !isSpouse && (
+          {/* Location — compact, primary only */}
+          {data.location && !isSpouse && !isDeceased && (
             <div style={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: '0.48rem',
-              color: '#A09585',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              marginTop: 3,
+              fontSize: '0.42rem',
+              color: '#B0A898',
+              letterSpacing: '0.06em',
+              marginTop: 1,
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
             }}>
               {data.location}
             </div>
