@@ -204,7 +204,17 @@ async function callOpenAI(transcript, previousData, sessionId) {
 
   // Strip markdown fences if present
   const cleaned = content.replace(/```json|```/g, '').trim();
-  return JSON.parse(cleaned);
+  const parsed  = JSON.parse(cleaned);
+
+  // Attach token usage so the UI can show cost
+  const usage = result.usage || {};
+  parsed._usage = {
+    prompt_tokens:     usage.prompt_tokens     || 0,
+    completion_tokens: usage.completion_tokens || 0,
+    total_tokens:      usage.total_tokens      || 0,
+  };
+
+  return parsed;
 }
 
 // ── Main export ──────────────────────────────────────────────────
